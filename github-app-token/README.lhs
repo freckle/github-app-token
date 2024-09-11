@@ -22,6 +22,7 @@ import Prelude
 
 import Control.Lens ((^?))
 import Data.Aeson.Lens
+import Data.ByteString.Char8 qualified as BS8
 import Data.Text.Encoding (encodeUtf8)
 import GitHub.App.Token
 import Network.HTTP.Simple
@@ -32,13 +33,11 @@ example :: IO ()
 example = do
   creds <- AppCredentials
     <$> (AppId . read <$> getEnv "GITHUB_APP_ID")
-    <*> (PrivateKey <$> getEnv "GITHUB_PRIVATE_KEY")
+    <*> (PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY")
   installationId <- InstallationId . read <$> getEnv "GITHUB_INSTALLATION_ID"
 
-  -- Generate token
   token <- generateInstallationToken creds installationId
 
-  -- Use token
   req <- parseRequest "https://api.github.com/repos/freckle/github-app-token"
   resp <- httpLBS
     $ addRequestHeader hAccept "application/json"

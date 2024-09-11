@@ -75,6 +75,7 @@ tests:
     main: README.lhs
     ghc-options: -pgmL markdown-unlit
     dependencies:
+      - bytestring
       - directory
       - dotenv
       - github-app-token

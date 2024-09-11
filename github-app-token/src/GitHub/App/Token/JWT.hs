@@ -5,7 +5,6 @@ module GitHub.App.Token.JWT
 
     -- * Private RSA Key data
   , PrivateKey (..)
-  , readPrivateKey
 
     -- * Errors
   , InvalidPrivateKey (..)
@@ -30,12 +29,9 @@ newtype Issuer = Issuer
   deriving stock (Show)
 
 newtype PrivateKey = PrivateKey
-  { unwrap :: String
+  { unwrap :: ByteString
   }
   deriving stock (Show)
-
-readPrivateKey :: MonadIO m => Path b File -> m PrivateKey
-readPrivateKey = fmap PrivateKey . liftIO . readFile . toFilePath
 
 newtype InvalidPrivateKey = InvalidPrivateKey PrivateKey
   deriving stock (Show)
@@ -63,8 +59,10 @@ signJWT expirationTime issuer privateKey = liftIO $ do
   let expiration = addUTCTime expirationTime.unwrap now
 
   signer <-
-    maybe (throwIO $ InvalidPrivateKey privateKey) pure
-      =<< JWT.rsaKeySecret privateKey.unwrap
+    maybe
+      (throwIO $ InvalidPrivateKey privateKey)
+      (pure . JWT.EncodeRSAPrivateKey)
+      $ JWT.readRsaSecret privateKey.unwrap
 
   iat <-
     maybe (throwIO $ InvalidDate "iat" now) pure
