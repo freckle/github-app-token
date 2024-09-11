@@ -30,9 +30,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - run: |
+          cat > github-app-token/key.pem <<'EOM'
+          ${{ secrets.FRECKLE_AUTOMATION_PRIVATE_KEY }}
+          EOM
+
       - uses: freckle/stack-action@v5
         env:
           STACK_YAML: ${{ matrix.stack-yaml }}
+          GITHUB_APP_ID: ${{ vars.FRECKLE_AUTOMATION_APP_ID }}
+          GITHUB_INSTALLATION_ID: ${{ vars.FRECKLE_AUTOMATION_INSTALLATION_ID }}
 
   lint:
     runs-on: ubuntu-latest
