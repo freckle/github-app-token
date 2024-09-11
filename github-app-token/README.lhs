@@ -31,11 +31,11 @@ import System.Environment
 
 example :: IO ()
 example = do
-  creds <- AppCredentials
-    <$> (AppId . read <$> getEnv "GITHUB_APP_ID")
-    <*> (PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY")
+  appId <- AppId . read <$> getEnv "GITHUB_APP_ID"
+  privateKey <- PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY"
   installationId <- InstallationId . read <$> getEnv "GITHUB_INSTALLATION_ID"
 
+  let creds = AppCredentials {appId, privateKey}
   token <- generateInstallationToken creds installationId
 
   req <- parseRequest "https://api.github.com/repos/freckle/github-app-token"
@@ -46,7 +46,7 @@ example = do
     $ req
 
   print $ getResponseBody resp ^? key "description" . _String
-  -- Just "Generate an installation token for a GitHub App"
+  -- => Just "Generate an installation token for a GitHub App"
 ```
 
 <!--
