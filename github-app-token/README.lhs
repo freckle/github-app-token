@@ -8,8 +8,6 @@
 
 <!--
 ```haskell
-{-# LANGUAGE TemplateHaskell #-}
-
 module Main (module Main) where
 
 import Configuration.Dotenv qualified as Dotenv
@@ -23,31 +21,29 @@ import Text.Markdown.Unlit ()
 import Prelude
 
 import Control.Lens ((^?))
-import Data.Aeson
 import Data.Aeson.Lens
 import Data.Text.Encoding (encodeUtf8)
 import GitHub.App.Token
 import Network.HTTP.Simple
-import Network.HTTP.Types.Header (hUserAgent, hAuthorization)
+import Network.HTTP.Types.Header (hAccept, hAuthorization, hUserAgent)
 import System.Environment
-import Path (mkRelFile)
 
 example :: IO ()
 example = do
-  -- NB: see the separate github-app-token-cli for nicer ways to load these
-  -- secrets within optparse-applicative and/or envparse.
-  appId <- AppId . read <$> getEnv "GITHUB_APP_ID"
-  privateKey <- readPrivateKey $(mkRelFile "key.pem")
+  creds <- AppCredentials
+    <$> (AppId . read <$> getEnv "GITHUB_APP_ID")
+    <*> (PrivateKey <$> getEnv "GITHUB_PRIVATE_KEY")
   installationId <- InstallationId . read <$> getEnv "GITHUB_INSTALLATION_ID"
 
   -- Generate token
-  token <- generateInstallationToken AppCredentials {appId, privateKey} installationId
+  token <- generateInstallationToken creds installationId
 
   -- Use token
   req <- parseRequest "https://api.github.com/repos/freckle/github-app-token"
-  resp <- httpJSON @_ @Value
-    $ addRequestHeader hUserAgent "github-app-token/example"
+  resp <- httpLBS
+    $ addRequestHeader hAccept "application/json"
     $ addRequestHeader hAuthorization ("Bearer " <> encodeUtf8 token.token)
+    $ addRequestHeader hUserAgent "github-app-token/example"
     $ req
 
   print $ getResponseBody resp ^? key "description" . _String

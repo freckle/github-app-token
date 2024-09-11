@@ -83,8 +83,7 @@ test-suite readme
       TypeFamilies
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -pgmL markdown-unlit
   build-depends:
-      aeson
-    , base <5
+      base <5
     , directory
     , dotenv
     , github-app-token
@@ -93,7 +92,6 @@ test-suite readme
     , lens
     , lens-aeson
     , markdown-unlit
-    , path
     , text
   default-language: GHC2021
   if impl(ghc >= 9.8)

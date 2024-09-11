@@ -75,7 +75,6 @@ tests:
     main: README.lhs
     ghc-options: -pgmL markdown-unlit
     dependencies:
-      - aeson
       - directory
       - dotenv
       - github-app-token
@@ -84,5 +83,4 @@ tests:
       - lens
       - lens-aeson
       - markdown-unlit
-      - path
       - text
