@@ -76,6 +76,7 @@ tests:
     ghc-options: -pgmL markdown-unlit
     dependencies:
       - aeson
+      - directory
       - dotenv
       - github-app-token
       - http-conduit

@@ -13,6 +13,8 @@
 module Main (module Main) where
 
 import Configuration.Dotenv qualified as Dotenv
+import Control.Monad (when)
+import System.Directory (doesFileExist)
 import Text.Markdown.Unlit ()
 ```
 -->
@@ -56,7 +58,8 @@ example = do
 ```haskell
 main :: IO ()
 main = do
-  Dotenv.loadFile Dotenv.defaultConfig
+  isLocal <- doesFileExist ".env"
+  when isLocal $ Dotenv.loadFile Dotenv.defaultConfig
   example
 ```
 -->

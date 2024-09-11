@@ -85,6 +85,7 @@ test-suite readme
   build-depends:
       aeson
     , base <5
+    , directory
     , dotenv
     , github-app-token
     , http-conduit
