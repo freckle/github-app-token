@@ -1,15 +1,14 @@
 module GitHub.App.Token.Prelude
   ( module X
-  , module GitHub.App.Token.Prelude
   ) where
 
-import Prelude as X
+import Prelude as X hiding (exp)
 
+import Control.Monad as X (unless, when)
 import Control.Monad.IO.Class as X (MonadIO (..))
 import Data.ByteString as X (ByteString)
+import Data.Text as X (Text, pack, unpack)
+import Data.Time as X (UTCTime)
+import GHC.Generics as X (Generic)
 import Path as X (Abs, Dir, File, Path, Rel, toFilePath)
-
-import Data.ByteString qualified as BS
-
-readBinary :: MonadIO m => Path b File -> m ByteString
-readBinary = liftIO . BS.readFile . toFilePath
+import UnliftIO.Exception as X (Exception, throwIO)

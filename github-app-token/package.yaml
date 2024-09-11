@@ -54,8 +54,15 @@ default-extensions:
 library:
   source-dirs: src
   dependencies:
+    - aeson
     - bytestring
+    - http-conduit
+    - jwt
+    - text
+    - time
+    - http-types
     - path
+    - unliftio
 
 # tests:
 #   spec:

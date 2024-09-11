@@ -2,9 +2,9 @@ module GitHub.App.Token.AppCredentials
   ( AppCredentials (..)
   , AppId (..)
   , PrivateKey (..)
-  , readPrivateKey
   ) where
 
+import GitHub.App.Token.JWT (PrivateKey (..))
 import GitHub.App.Token.Prelude
 
 data AppCredentials = AppCredentials
@@ -15,10 +15,3 @@ data AppCredentials = AppCredentials
 newtype AppId = AppId
   { unwrap :: Int
   }
-
-newtype PrivateKey = PrivateKey
-  { unwrap :: ByteString
-  }
-
-readPrivateKey :: MonadIO m => Path b File -> m PrivateKey
-readPrivateKey = fmap PrivateKey . readBinary
