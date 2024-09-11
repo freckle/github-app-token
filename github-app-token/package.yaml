@@ -2,8 +2,8 @@ name: github-app-token
 version: 0.0.0.0
 maintainer: Freckle Education
 category: HTTP
-github: freckle/freckle-app
-synopsis: Library for generating GitHub App installation tokens
+github: freckle/github-app-token
+synopsis: Generate an installation access token for a GitHub App
 description: Please see README.md
 
 extra-doc-files:

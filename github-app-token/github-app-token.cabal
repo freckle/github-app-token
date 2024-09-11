@@ -6,11 +6,11 @@ cabal-version: 1.18
 
 name:           github-app-token
 version:        0.0.0.0
-synopsis:       Library for generating GitHub App installation tokens
+synopsis:       Generate an installation access token for a GitHub App
 description:    Please see README.md
 category:       HTTP
-homepage:       https://github.com/freckle/freckle-app#readme
-bug-reports:    https://github.com/freckle/freckle-app/issues
+homepage:       https://github.com/freckle/github-app-token#readme
+bug-reports:    https://github.com/freckle/github-app-token/issues
 maintainer:     Freckle Education
 build-type:     Simple
 extra-doc-files:
@@ -19,7 +19,7 @@ extra-doc-files:
 
 source-repository head
   type: git
-  location: https://github.com/freckle/freckle-app
+  location: https://github.com/freckle/github-app-token
 
 library
   exposed-modules:
