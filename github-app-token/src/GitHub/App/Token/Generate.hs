@@ -24,7 +24,7 @@ import Network.HTTP.Simple
   , httpLBS
   , parseRequest
   )
-import Network.HTTP.Types.Header (hAccept, hAuthorization)
+import Network.HTTP.Types.Header (hAccept, hAuthorization, hUserAgent)
 import Network.HTTP.Types.Status (Status, statusIsSuccessful)
 
 newtype InstallationId = InstallationId
@@ -35,7 +35,7 @@ data AccessToken = AccessToken
   { token :: Text
   , expires_at :: UTCTime
   }
-  deriving stock (Generic)
+  deriving stock (Show, Generic)
   deriving anyclass (FromJSON)
 
 data AccessTokenHttpError = AccessTokenHttpError
@@ -71,7 +71,8 @@ generateInstallationToken creds installationId = do
   resp <-
     httpLBS
       $ addRequestHeader hAccept "application/vnd.github+json"
-      $ addRequestHeader hAuthorization ("Bearer <> " <> jwt)
+      $ addRequestHeader hAuthorization ("Bearer " <> jwt)
+      $ addRequestHeader hUserAgent "github-app-token"
       $ addRequestHeader "X-GitHub-Api-Version" "2022-11-28" req
 
   let

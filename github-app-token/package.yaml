@@ -64,10 +64,24 @@ library:
     - path
     - unliftio
 
-# tests:
+tests:
 #   spec:
 #     main: Main.hs
 #     source-dirs: tests
 #     ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
 #     dependencies:
 #       - github-app-token
+  readme:
+    main: README.lhs
+    ghc-options: -pgmL markdown-unlit
+    dependencies:
+      - aeson
+      - dotenv
+      - github-app-token
+      - http-conduit
+      - http-types
+      - lens
+      - lens-aeson
+      - markdown-unlit
+      - path
+      - text

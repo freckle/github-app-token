@@ -1,8 +1,13 @@
 module GitHub.App.Token
-  ( AppCredentials (..)
+  ( generateInstallationToken
+  , AppCredentials (..)
+  , AppId (..)
+  , PrivateKey (..)
+  , readPrivateKey
   , InstallationId (..)
-  , generateInstallationToken
+  , AccessToken (..)
   ) where
 
 import GitHub.App.Token.AppCredentials
 import GitHub.App.Token.Generate
+import GitHub.App.Token.JWT
