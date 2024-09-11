@@ -85,7 +85,7 @@ generateInstallationToken creds installationId = do
 
   either (throwIO . AccessTokenJsonDecodeError body) pure $ eitherDecode body
  where
-  -- We're going to use it right away and only onces, so 5m should be more than
+  -- We're going to use it right away and only once, so 5m should be more than
   -- enough
   expiration = ExpirationTime $ 5 * 60
   issuer = Issuer $ pack $ show creds.appId.unwrap
