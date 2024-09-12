@@ -1,5 +1,5 @@
 name: github-app-token
-version: 0.0.0.0
+version: 0.0.0.1
 maintainer: Freckle Education
 category: HTTP
 github: freckle/github-app-token

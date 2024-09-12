@@ -1,5 +1,10 @@
 # GitHub App Token
 
+[![Hackage](https://img.shields.io/hackage/v/github-app-token.svg?style=flat)](https://hackage.haskell.org/package/github-app-token)
+[![Stackage Nightly](http://stackage.org/package/github-app-token/badge/nightly)](http://stackage.org/nightly/package/github-app-token)
+[![Stackage LTS](http://stackage.org/package/github-app-token/badge/lts)](http://stackage.org/lts/package/github-app-token)
+[![CI](https://github.com/freckle/github-app-token/actions/workflows/ci.yml/badge.svg)](https://github.com/freckle/github-app-token/actions/workflows/ci.yml)
+
 [Generate an installation access token for a GitHub App][docs]
 
 [docs]: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation
@@ -58,3 +63,7 @@ main = do
   example
 ```
 -->
+
+---
+
+[CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)

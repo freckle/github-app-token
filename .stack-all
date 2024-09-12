@@ -1,0 +1,3 @@
+[versions]
+# Can't go lower because we're using OverloadedRecordDot-et-al
+oldest = lts-20
