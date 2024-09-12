@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: generate
+        uses: freckle/stack-action/generate-matrix@v5
+    outputs:
+      stack-yamls: ${{ steps.generate.outputs.stack-yamls }}
+
+  test:
+    runs-on: ubuntu-latest
+    needs: generate
+
+    strategy:
+      matrix:
+        stack-yaml: ${{ fromJSON(needs.generate.outputs.stack-yamls) }}
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: freckle/stack-action@v5
+        env:
+          STACK_YAML: ${{ matrix.stack-yaml }}
+          GITHUB_APP_ID: ${{ vars.FRECKLE_AUTOMATION_APP_ID }}
+          GITHUB_PRIVATE_KEY: ${{ secrets.FRECKLE_AUTOMATION_PRIVATE_KEY }}
+          GITHUB_INSTALLATION_ID: ${{ vars.FRECKLE_AUTOMATION_INSTALLATION_ID }}
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: haskell-actions/hlint-setup@v2
+      - uses: haskell-actions/hlint-run@v2
+        with:
+          fail-on: warning

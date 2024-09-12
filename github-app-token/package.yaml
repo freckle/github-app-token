@@ -1,0 +1,87 @@
+name: github-app-token
+version: 0.0.0.0
+maintainer: Freckle Education
+category: HTTP
+github: freckle/github-app-token
+synopsis: Generate an installation access token for a GitHub App
+description: Please see README.md
+
+extra-doc-files:
+  - README.md
+  - CHANGELOG.md
+
+language: GHC2021
+
+ghc-options:
+  - -fignore-optim-changes
+  - -fwrite-ide-info
+  - -Weverything
+  - -Wno-all-missed-specialisations
+  - -Wno-missing-exported-signatures # re-enables missing-signatures
+  - -Wno-missing-import-lists
+  - -Wno-missing-kind-signatures
+  - -Wno-missing-local-signatures
+  - -Wno-missing-safe-haskell-mode
+  - -Wno-monomorphism-restriction
+  - -Wno-prepositive-qualified-module
+  - -Wno-safe
+  - -Wno-unsafe
+
+when:
+  - condition: "impl(ghc >= 9.8)"
+    ghc-options:
+      - -Wno-missing-role-annotations
+      - -Wno-missing-poly-kind-signatures
+
+dependencies:
+  - base < 5
+
+default-extensions:
+  - DataKinds
+  - DeriveAnyClass
+  - DerivingVia
+  - DerivingStrategies
+  - DuplicateRecordFields
+  - GADTs
+  - LambdaCase
+  - NoImplicitPrelude
+  - NoMonomorphismRestriction
+  - OverloadedRecordDot
+  - OverloadedStrings
+  - RecordWildCards
+  - TypeFamilies
+
+library:
+  source-dirs: src
+  dependencies:
+    - aeson
+    - bytestring
+    - http-conduit
+    - jwt
+    - text
+    - time
+    - http-types
+    - path
+    - unliftio
+
+tests:
+  # spec:
+  #   main: Main.hs
+  #   source-dirs: tests
+  #   ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
+  #   dependencies:
+  #     - github-app-token
+  readme:
+    main: README.lhs
+    ghc-options: -pgmL markdown-unlit
+    dependencies:
+      - bytestring
+      - directory
+      - dotenv
+      - github-app-token
+      - http-conduit
+      - http-types
+      - lens
+      - lens-aeson
+      - markdown-unlit
+      - text
