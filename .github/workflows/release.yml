@@ -1,0 +1,20 @@
+name: Release
+
+on:
+  push:
+    branches: main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: tag
+        uses: freckle/haskell-tag-action@v1
+
+      - if: steps.tag.outputs.tag
+        uses: freckle/stack-upload-action@v2
+        env:
+          HACKAGE_API_KEY: ${{ secrets.HACKAGE_UPLOAD_API_KEY }}
+          STACK_YAML: stack-lts20.yaml
