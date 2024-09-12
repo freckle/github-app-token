@@ -63,3 +63,7 @@ main = do
   example
 ```
 -->
+
+---
+
+[CHANGELOG](./CHANGELOG.md) | [LICENSE](./LICENSE)
