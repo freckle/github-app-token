@@ -1,4 +1,1 @@
 resolver: lts-22.34
-packages:
-  - github-app-token
-  # - github-app-token-cli
