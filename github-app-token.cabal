@@ -12,6 +12,8 @@ category:       HTTP
 homepage:       https://github.com/freckle/github-app-token#readme
 bug-reports:    https://github.com/freckle/github-app-token/issues
 maintainer:     Freckle Education
+license:        MIT
+license-file:   LICENSE
 build-type:     Simple
 extra-doc-files:
     README.md
