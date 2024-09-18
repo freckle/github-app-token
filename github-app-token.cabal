@@ -30,6 +30,7 @@ library
       GitHub.App.Token.Generate
       GitHub.App.Token.JWT
       GitHub.App.Token.Prelude
+      GitHub.App.Token.Refresh
   other-modules:
       Paths_github_app_token
   hs-source-dirs:
@@ -96,6 +97,39 @@ test-suite readme
     , lens-aeson
     , markdown-unlit
     , text
+  default-language: GHC2021
+  if impl(ghc >= 9.8)
+    ghc-options: -Wno-missing-role-annotations -Wno-missing-poly-kind-signatures
+
+test-suite spec
+  type: exitcode-stdio-1.0
+  main-is: Main.hs
+  other-modules:
+      GitHub.App.Token.RefreshSpec
+      Paths_github_app_token
+  hs-source-dirs:
+      tests
+  default-extensions:
+      DataKinds
+      DeriveAnyClass
+      DerivingVia
+      DerivingStrategies
+      DuplicateRecordFields
+      GADTs
+      LambdaCase
+      NoImplicitPrelude
+      NoMonomorphismRestriction
+      OverloadedRecordDot
+      OverloadedStrings
+      RecordWildCards
+      TypeFamilies
+  ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -threaded -rtsopts "-with-rtsopts=-N"
+  build-depends:
+      base <5
+    , github-app-token
+    , hspec
+    , time
+    , unliftio
   default-language: GHC2021
   if impl(ghc >= 9.8)
     ghc-options: -Wno-missing-role-annotations -Wno-missing-poly-kind-signatures

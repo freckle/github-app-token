@@ -65,12 +65,15 @@ library:
     - unliftio
 
 tests:
-  # spec:
-  #   main: Main.hs
-  #   source-dirs: tests
-  #   ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
-  #   dependencies:
-  #     - github-app-token
+  spec:
+    main: Main.hs
+    source-dirs: tests
+    ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
+    dependencies:
+      - github-app-token
+      - time
+      - unliftio
+      - hspec
   readme:
     main: README.lhs
     ghc-options: -pgmL markdown-unlit
