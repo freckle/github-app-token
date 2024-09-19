@@ -78,13 +78,13 @@ tests:
     main: README.lhs
     ghc-options: -pgmL markdown-unlit
     dependencies:
+      - aeson
       - bytestring
       - directory
       - dotenv
       - github-app-token
       - http-conduit
       - http-types
-      - lens
-      - lens-aeson
+      - hspec
       - markdown-unlit
       - text

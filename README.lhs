@@ -17,7 +17,10 @@ module Main (module Main) where
 
 import Configuration.Dotenv qualified as Dotenv
 import Control.Monad (when)
+import Data.Traversable (for)
+import GitHub.App.Token.Refresh
 import System.Directory (doesFileExist)
+import Test.Hspec qualified as Hspec
 import Text.Markdown.Unlit ()
 ```
 -->
@@ -25,33 +28,68 @@ import Text.Markdown.Unlit ()
 ```haskell
 import Prelude
 
-import Control.Lens ((^?))
-import Data.Aeson.Lens
+import Data.Aeson (FromJSON)
 import Data.ByteString.Char8 qualified as BS8
+import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
+import GHC.Generics (Generic)
 import GitHub.App.Token
 import Network.HTTP.Simple
-import Network.HTTP.Types.Header (hAccept, hAuthorization, hUserAgent)
+import Network.HTTP.Types.Header (hAuthorization, hUserAgent)
 import System.Environment
 
-example :: IO ()
-example = do
+getAppToken :: IO AccessToken
+getAppToken = do
   appId <- AppId . read <$> getEnv "GITHUB_APP_ID"
   privateKey <- PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY"
   installationId <- InstallationId . read <$> getEnv "GITHUB_INSTALLATION_ID"
 
   let creds = AppCredentials {appId, privateKey}
-  token <- generateInstallationToken creds installationId
+  generateInstallationToken creds installationId
 
-  req <- parseRequest "https://api.github.com/repos/freckle/github-app-token"
-  resp <- httpLBS
-    $ addRequestHeader hAccept "application/json"
+data Repo = Repo
+  { name :: Text
+  , description :: Text
+  }
+  deriving stock (Eq, Show, Generic)
+  deriving anyclass FromJSON
+
+getRepo :: String -> IO Repo
+getRepo name = do
+  token <- getAppToken
+  req <- parseRequest $ "https://api.github.com/repos/" <> name
+  resp <- httpJSON
     $ addRequestHeader hAuthorization ("Bearer " <> encodeUtf8 token.token)
     $ addRequestHeader hUserAgent "github-app-token/example"
     $ req
 
-  print $ getResponseBody resp ^? key "description" . _String
-  -- => Just "Generate an installation token for a GitHub App"
+  pure $ getResponseBody resp
+```
+
+## Refreshing
+
+Installation tokens are good for one hour, after which point using them will
+respond with `401 Unauthorized`. To avoid this, you can use the
+`GitHub.App.Token.Refresh` module to maintain a background thread that refreshes
+the token as necessary:
+
+```haskell
+getRepos :: [String] -> IO [Repo]
+getRepos names = do
+  ref <- refreshing getAppToken
+
+  repos <- for names $ \name -> do
+    token <- getRefresh ref
+    req <- parseRequest $ "https://api.github.com/repos/" <> name
+    resp <- httpJSON
+      $ addRequestHeader hAuthorization ("Bearer " <> encodeUtf8 token.token)
+      $ addRequestHeader hUserAgent "github-app-token/example"
+      $ req
+
+    pure $ getResponseBody resp
+
+  cancelRefresh ref
+  pure repos
 ```
 
 <!--
@@ -60,7 +98,31 @@ main :: IO ()
 main = do
   isLocal <- doesFileExist ".env"
   when isLocal $ Dotenv.loadFile Dotenv.defaultConfig
-  example
+
+  Hspec.hspec $ do
+    Hspec.describe "Basic usage" $ do
+      Hspec.it "works" $ do
+        getRepo "freckle/github-app-token"
+          `Hspec.shouldReturn` Repo
+            { name = "github-app-token"
+            , description = "Generate an installation token for a GitHub App"
+            }
+
+    Hspec.describe "Self-refreshing tokens" $ do
+      Hspec.it "works" $ do
+        let
+          names :: [String]
+          names =
+            [ "freckle/github-app-token"
+            , "freckle/stack-action"
+            , "freckle/stackctl"
+            ]
+
+        getRepos names `Hspec.shouldReturn`
+          [ Repo {name="github-app-token", description = "Generate an installation token for a GitHub App"}
+          , Repo {name="stack-action", description = "GitHub Action to build, test, and lint Stack-based Haskell projects"}
+          , Repo {name="stackctl", description = "Manage CloudFormation Stacks through specifications"}
+          ]
 ```
 -->
 
