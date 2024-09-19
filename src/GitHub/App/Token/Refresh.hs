@@ -8,8 +8,7 @@ module GitHub.App.Token.Refresh
 
 import GitHub.App.Token.Prelude
 
-import Control.Monad (forever)
-import Data.Time (getCurrentTime)
+import Data.Time (diffUTCTime, getCurrentTime)
 import Data.Void (Void)
 import GitHub.App.Token.Generate (AccessToken (..))
 import UnliftIO (MonadUnliftIO)
@@ -56,12 +55,25 @@ refreshing :: (MonadUnliftIO m, HasExpiresAt a) => m a -> m (Refresh a)
 refreshing f = do
   x <- f
   ref <- newIORef x
-  thread <- async $ forever $ do
-    threadDelay $ round @Double $ 0.5 * 1000000 -- 0.5s
-    now <- liftIO getCurrentTime
-    isExpired <- (<= now) . expiresAt <$> readIORef ref
-    when isExpired $ writeIORef ref =<< f
+  thread <- async $ loop ref x
   pure Refresh {ref, thread}
+ where
+  loop ref current = do
+    now <- liftIO getCurrentTime
+    threadDelay $ refreshInMicroseconds current now
+
+    updated <- f
+    writeIORef ref updated
+    loop ref updated
+
+refreshInMicroseconds :: HasExpiresAt a => a -> UTCTime -> Int
+refreshInMicroseconds a = do
+  round @Double @Int
+    . (* 0.95) -- refresh a little early
+    . (* 1000000) -- convert to microseconds
+    . realToFrac
+    . max 0 -- negative expiry means refresh right away
+    . diffUTCTime (expiresAt a)
 
 getRefresh :: MonadIO m => Refresh a -> m a
 getRefresh = readIORef . (.ref)
