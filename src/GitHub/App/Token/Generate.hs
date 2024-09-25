@@ -3,6 +3,11 @@ module GitHub.App.Token.Generate
   , AccessToken (..)
   , generateInstallationToken
 
+    -- * Scoping 'AccessToken's
+  , CreateAccessToken (..)
+  , module GitHub.App.Token.Permissions
+  , generateInstallationTokenScoped
+
     -- * Errors
   , InvalidPrivateKey (..)
   , InvalidDate (..)
@@ -13,16 +18,19 @@ module GitHub.App.Token.Generate
 
 import GitHub.App.Token.Prelude
 
-import Data.Aeson (FromJSON, eitherDecode)
+import Data.Aeson (FromJSON, ToJSON, eitherDecode)
 import Data.ByteString.Lazy qualified as BSL
+import Data.Semigroup.Generic
 import GitHub.App.Token.AppCredentials
 import GitHub.App.Token.JWT
+import GitHub.App.Token.Permissions
 import Network.HTTP.Simple
   ( addRequestHeader
   , getResponseBody
   , getResponseStatus
   , httpLBS
   , parseRequest
+  , setRequestBodyJSON
   )
 import Network.HTTP.Types.Header (hAccept, hAuthorization, hUserAgent)
 import Network.HTTP.Types.Status (Status, statusIsSuccessful)
@@ -52,12 +60,34 @@ data AccessTokenJsonDecodeError = AccessTokenJsonDecodeError
   deriving stock (Show)
   deriving anyclass (Exception)
 
+-- | Generate a token for all repositories and the installation's permissions
+--
+-- See 'generateInstallationTokenScoped' for changing either of these.
 generateInstallationToken
   :: MonadIO m
   => AppCredentials
   -> InstallationId
   -> m AccessToken
-generateInstallationToken creds installationId = do
+generateInstallationToken = generateInstallationTokenScoped mempty
+
+-- | <https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app>
+data CreateAccessToken = CreateAccessToken
+  { repositories :: [Text]
+  -- ^ List of @{owner}/{name}@ values
+  , repository_ids :: [Int]
+  , permissions :: Permissions
+  }
+  deriving stock (Eq, Generic)
+  deriving anyclass (ToJSON)
+  deriving (Semigroup, Monoid) via GenericSemigroupMonoid CreateAccessToken
+
+generateInstallationTokenScoped
+  :: MonadIO m
+  => CreateAccessToken
+  -> AppCredentials
+  -> InstallationId
+  -> m AccessToken
+generateInstallationTokenScoped create creds installationId = do
   jwt <- signJWT expiration issuer creds.privateKey
 
   req <-
@@ -67,13 +97,17 @@ generateInstallationToken creds installationId = do
       <> show installationId.unwrap
       <> "/access_tokens"
 
+  -- Avoid encoding to "{}", which causes a 500
+  let setBody = if create == mempty then id else setRequestBodyJSON create
+
   -- parse the response body ourselves, to improve error messages
   resp <-
     httpLBS
       $ addRequestHeader hAccept "application/vnd.github+json"
       $ addRequestHeader hAuthorization ("Bearer " <> jwt)
       $ addRequestHeader hUserAgent "github-app-token"
-      $ addRequestHeader "X-GitHub-Api-Version" "2022-11-28" req
+      $ addRequestHeader "X-GitHub-Api-Version" "2022-11-28"
+      $ setBody req
 
   let
     status = getResponseStatus resp

@@ -29,6 +29,7 @@ library
       GitHub.App.Token.AppCredentials
       GitHub.App.Token.Generate
       GitHub.App.Token.JWT
+      GitHub.App.Token.Permissions
       GitHub.App.Token.Prelude
       GitHub.App.Token.Refresh
   other-modules:
@@ -57,7 +58,9 @@ library
     , http-conduit
     , http-types
     , jwt
+    , monoidal-containers
     , path
+    , semigroups
     , text
     , time
     , unliftio
@@ -105,6 +108,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Main.hs
   other-modules:
+      GitHub.App.Token.PermissionsSpec
       GitHub.App.Token.RefreshSpec
       Paths_github_app_token
   hs-source-dirs:
@@ -125,7 +129,8 @@ test-suite spec
       TypeFamilies
   ghc-options: -fignore-optim-changes -fwrite-ide-info -Weverything -Wno-all-missed-specialisations -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missing-kind-signatures -Wno-missing-local-signatures -Wno-missing-safe-haskell-mode -Wno-monomorphism-restriction -Wno-prepositive-qualified-module -Wno-safe -Wno-unsafe -threaded -rtsopts "-with-rtsopts=-N"
   build-depends:
-      base <5
+      aeson
+    , base <5
     , github-app-token
     , hspec
     , time
