@@ -58,9 +58,11 @@ library:
     - bytestring
     - http-conduit
     - jwt
+    - semigroups
     - text
     - time
     - http-types
+    - monoidal-containers
     - path
     - unliftio
 
@@ -70,6 +72,7 @@ tests:
     source-dirs: tests
     ghc-options: -threaded -rtsopts "-with-rtsopts=-N"
     dependencies:
+      - aeson
       - github-app-token
       - time
       - unliftio

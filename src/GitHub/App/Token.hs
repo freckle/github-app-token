@@ -5,7 +5,13 @@ module GitHub.App.Token
   , PrivateKey (..)
   , InstallationId (..)
   , AccessToken (..)
+
+    -- * Scoped
+  , CreateAccessToken (..)
+  , module GitHub.App.Token.Permissions
+  , generateInstallationTokenScoped
   ) where
 
 import GitHub.App.Token.AppCredentials
 import GitHub.App.Token.Generate
+import GitHub.App.Token.Permissions

@@ -66,6 +66,29 @@ getRepo name = do
   pure $ getResponseBody resp
 ```
 
+## Scoping
+
+By default, a token is created with repositories access and permissions as
+defined in the installation configuration. Either of these can be changed by
+using `generateInstallationTokenScoped`:
+
+```haskell
+getScopedAppToken :: IO AccessToken
+getScopedAppToken = do
+  appId <- AppId . read <$> getEnv "GITHUB_APP_ID"
+  privateKey <- PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY"
+  installationId <- InstallationId . read <$> getEnv "GITHUB_INSTALLATION_ID"
+
+  let
+    creds = AppCredentials {appId, privateKey}
+    create = mempty
+      { repositories = ["freckle/github-app-token"]
+      , permissions = contents Read
+      }
+
+  generateInstallationTokenScoped create creds installationId
+```
+
 ## Refreshing
 
 Installation tokens are good for one hour, after which point using them will
