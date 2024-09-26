@@ -10,6 +10,11 @@ module GitHub.App.Token
   , CreateAccessToken (..)
   , module GitHub.App.Token.Permissions
   , generateInstallationTokenScoped
+
+    -- * By Owner
+  , Owner (..)
+  , generateOwnerToken
+  , generateOwnerTokenScoped
   ) where
 
 import GitHub.App.Token.AppCredentials
