@@ -44,6 +44,7 @@ library
       DuplicateRecordFields
       GADTs
       LambdaCase
+      NoFieldSelectors
       NoImplicitPrelude
       NoMonomorphismRestriction
       OverloadedRecordDot
@@ -81,6 +82,7 @@ test-suite readme
       DuplicateRecordFields
       GADTs
       LambdaCase
+      NoFieldSelectors
       NoImplicitPrelude
       NoMonomorphismRestriction
       OverloadedRecordDot
@@ -121,6 +123,7 @@ test-suite spec
       DuplicateRecordFields
       GADTs
       LambdaCase
+      NoFieldSelectors
       NoImplicitPrelude
       NoMonomorphismRestriction
       OverloadedRecordDot
