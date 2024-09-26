@@ -82,6 +82,7 @@ import GitHub.App.Token.Prelude hiding (Read)
 import Data.Aeson (ToJSON (..))
 import Data.Map.Monoidal.Strict (MonoidalMap)
 import Data.Map.Monoidal.Strict qualified as MonoidalMap
+import Data.Semigroup (Max (..))
 
 {-# ANN module ("HLint: ignore Use camelCase" :: String) #-}
 
@@ -95,14 +96,8 @@ data Permission
   = PermissionRead
   | PermissionWrite
   | PermissionAdmin
-  deriving stock (Eq, Show)
-
-instance Semigroup Permission where
-  _ <> PermissionAdmin = PermissionAdmin
-  PermissionAdmin <> _ = PermissionAdmin
-  _ <> PermissionWrite = PermissionWrite
-  PermissionWrite <> _ = PermissionWrite
-  PermissionRead <> PermissionRead = PermissionRead
+  deriving stock (Eq, Ord, Show)
+  deriving (Semigroup) via (Max Permission)
 
 instance ToJSON Permission where
   toJSON =
