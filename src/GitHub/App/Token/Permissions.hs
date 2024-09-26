@@ -88,14 +88,14 @@ import Data.Map.Monoidal.Strict qualified as MonoidalMap
 newtype Permissions = Permissions
   { _unwrap :: MonoidalMap Text Permission
   }
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
   deriving newtype (Semigroup, Monoid, ToJSON)
 
 data Permission
   = PermissionRead
   | PermissionWrite
   | PermissionAdmin
-  deriving stock (Eq)
+  deriving stock (Eq, Show)
 
 instance Semigroup Permission where
   _ <> PermissionAdmin = PermissionAdmin
