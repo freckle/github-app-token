@@ -14,7 +14,7 @@
 -- @
 -- let permissions = 'actions' 'Read' <> 'checks' 'Write'
 --
--- 'generateInstallationTokenScoped' AllRepositories permissions creds installationId
+-- 'generateInstallationTokenScoped' mempty {permissions} creds installationId
 -- @
 --
 -- Supplying the same permission more than once will take the higher:
