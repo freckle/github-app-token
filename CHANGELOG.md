@@ -1,4 +1,8 @@
-## [_Unreleased_](https://github.com/freckle/github-app-token/compare/v0.0.1.2...main)
+## [_Unreleased_](https://github.com/freckle/github-app-token/compare/v0.0.2.0...main)
+
+## [v0.0.2.0](https://github.com/freckle/github-app-token/compare/v0.0.1.2...v0.0.2.0)
+
+- Add `generateInstallationTokenScoped` and related types
 
 ## [v0.0.1.2](https://github.com/freckle/github-app-token/compare/v0.0.1.1...v0.0.1.2)
 
