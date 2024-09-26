@@ -12,8 +12,7 @@ spec :: Spec
 spec = do
   describe "Semigroup" $ do
     it "resolves duplicates by taking higher permission" $ do
-      encode (checks Read <> checks Write)
-        `shouldBe` "{\"checks\":\"write\"}"
+      checks Read <> checks Write `shouldBe` checks Write
 
   describe "ToJSON" $ do
     it "encodes correctly" $ do
