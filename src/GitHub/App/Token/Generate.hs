@@ -129,6 +129,12 @@ generateOwnerTokenScoped
   -> Owner
   -> m AccessToken
 generateOwnerTokenScoped create creds owner = do
+  -- If a repositories scope is given, use the first one (along with owner) to
+  -- get the installation. Otherwise use the org or user endpoint. This matches
+  -- how actions/create-github-app-token works:
+  --
+  -- https://github.com/actions/create-github-app-token/blob/5d869da34e18e7287c1daad50e0b8ea0f506ce69/lib/main.js#L113-L166
+  --
   installation <- getInstallation creds $ case (create.repositories, owner) of
     (repo : _, Org org) -> "/repos/" <> org <> "/" <> repo
     (repo : _, User username) -> "/repos/" <> username <> "/" <> repo
