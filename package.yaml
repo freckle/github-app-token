@@ -39,8 +39,8 @@ dependencies:
 default-extensions:
   - DataKinds
   - DeriveAnyClass
-  - DerivingVia
   - DerivingStrategies
+  - DerivingVia
   - DuplicateRecordFields
   - GADTs
   - LambdaCase

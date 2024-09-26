@@ -39,8 +39,8 @@ library
   default-extensions:
       DataKinds
       DeriveAnyClass
-      DerivingVia
       DerivingStrategies
+      DerivingVia
       DuplicateRecordFields
       GADTs
       LambdaCase
@@ -76,8 +76,8 @@ test-suite readme
   default-extensions:
       DataKinds
       DeriveAnyClass
-      DerivingVia
       DerivingStrategies
+      DerivingVia
       DuplicateRecordFields
       GADTs
       LambdaCase
@@ -116,8 +116,8 @@ test-suite spec
   default-extensions:
       DataKinds
       DeriveAnyClass
-      DerivingVia
       DerivingStrategies
+      DerivingVia
       DuplicateRecordFields
       GADTs
       LambdaCase
