@@ -3,10 +3,15 @@ module GitHub.App.Token.Generate
   , AccessToken (..)
   , generateInstallationToken
 
+    -- * Finding installations by owner
+  , Owner (..)
+  , generateOwnerToken
+
     -- * Scoping 'AccessToken's
   , CreateAccessToken (..)
   , module GitHub.App.Token.Permissions
   , generateInstallationTokenScoped
+  , generateOwnerTokenScoped
 
     -- * Errors
   , InvalidPrivateKey (..)
@@ -14,6 +19,8 @@ module GitHub.App.Token.Generate
   , InvalidIssuer (..)
   , AccessTokenHttpError (..)
   , AccessTokenJsonDecodeError (..)
+  , GetInstallationHttpError (..)
+  , GetInstallationJsonDecodeError (..)
   ) where
 
 import GitHub.App.Token.Prelude
@@ -37,9 +44,12 @@ import Network.HTTP.Simple
 import Network.HTTP.Types.Header (hAccept, hAuthorization, hUserAgent)
 import Network.HTTP.Types.Status (Status, statusIsSuccessful)
 
+{-# ANN module ("HLint: ignore Redundant id" :: String) #-}
+
 newtype InstallationId = InstallationId
   { unwrap :: Int
   }
+  deriving newtype (FromJSON)
 
 data AccessToken = AccessToken
   { token :: Text
@@ -72,6 +82,15 @@ generateInstallationToken
   -> m AccessToken
 generateInstallationToken = generateInstallationTokenScoped mempty
 
+data Owner = Org Text | User Text
+
+generateOwnerToken
+  :: MonadIO m
+  => AppCredentials
+  -> Owner
+  -> m AccessToken
+generateOwnerToken = generateOwnerTokenScoped mempty
+
 -- | <https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app>
 data CreateAccessToken = CreateAccessToken
   { repositories :: [Text]
@@ -102,6 +121,46 @@ generateInstallationTokenScoped create creds installationId = do
   appHttpJSON AccessTokenHttpError AccessTokenJsonDecodeError creds
     $ setRequestMethod "POST"
     $ setBody req
+
+generateOwnerTokenScoped
+  :: MonadIO m
+  => CreateAccessToken
+  -> AppCredentials
+  -> Owner
+  -> m AccessToken
+generateOwnerTokenScoped create creds owner = do
+  installation <- getInstallation creds $ case (create.repositories, owner) of
+    (repo : _, Org org) -> "/repos/" <> org <> "/" <> repo
+    (repo : _, User username) -> "/repos/" <> username <> "/" <> repo
+    ([], Org org) -> "/orgs/" <> org
+    ([], User username) -> "/users/" <> username
+
+  generateInstallationTokenScoped create creds installation.id
+
+newtype Installation = Installation
+  { id :: InstallationId
+  }
+  deriving stock (Generic)
+  deriving anyclass (FromJSON)
+
+data GetInstallationHttpError = GetInstallationHttpError
+  { status :: Status
+  , body :: BSL.ByteString
+  }
+  deriving stock (Show)
+  deriving anyclass (Exception)
+
+data GetInstallationJsonDecodeError = GetInstallationJsonDecodeError
+  { body :: BSL.ByteString
+  , message :: String
+  }
+  deriving stock (Show)
+  deriving anyclass (Exception)
+
+getInstallation :: MonadIO m => AppCredentials -> Text -> m Installation
+getInstallation creds prefix = do
+  req <- githubRequest $ unpack $ prefix <> "/installation"
+  appHttpJSON GetInstallationHttpError GetInstallationJsonDecodeError creds req
 
 githubRequest :: MonadIO m => String -> m Request
 githubRequest =
