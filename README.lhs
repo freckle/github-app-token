@@ -9,7 +9,7 @@
 
 [docs]: https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation
 
-## Usage
+## Getting an AccessToken
 
 <!--
 ```haskell
@@ -46,7 +46,11 @@ getAppToken = do
 
   let creds = AppCredentials {appId, privateKey}
   generateInstallationToken creds installationId
+```
 
+## Using an AccessToken
+
+```haskell
 data Repo = Repo
   { name :: Text
   , description :: Text
@@ -54,9 +58,8 @@ data Repo = Repo
   deriving stock (Eq, Show, Generic)
   deriving anyclass FromJSON
 
-getRepo :: String -> IO Repo
-getRepo name = do
-  token <- getAppToken
+getRepo :: AccessToken -> String -> IO Repo
+getRepo token name = do
   req <- parseRequest $ "https://api.github.com/repos/" <> name
   resp <- httpJSON
     $ addRequestHeader hAuthorization ("Bearer " <> encodeUtf8 token.token)
@@ -66,7 +69,7 @@ getRepo name = do
   pure $ getResponseBody resp
 ```
 
-## Scoping
+## Getting a Scoped AccessToken
 
 By default, a token is created with repositories access and permissions as
 defined in the installation configuration. Either of these can be changed by
@@ -89,7 +92,19 @@ getScopedAppToken = do
   generateInstallationTokenScoped create creds installationId
 ```
 
-## Refreshing
+## Getting an AccessToken for an Owner
+
+```haskell
+getOwnerAppToken :: IO AccessToken
+getOwnerAppToken = do
+  appId <- AppId . read <$> getEnv "GITHUB_APP_ID"
+  privateKey <- PrivateKey . BS8.pack <$> getEnv "GITHUB_PRIVATE_KEY"
+
+  let creds = AppCredentials {appId, privateKey}
+  generateOwnerToken creds $ Org "freckle"
+```
+
+## Getting a Self-Refreshing AccessToken
 
 Installation tokens are good for one hour, after which point using them will
 respond with `401 Unauthorized`. To avoid this, you can use the
@@ -103,13 +118,7 @@ getRepos names = do
 
   repos <- for names $ \name -> do
     token <- getRefresh ref
-    req <- parseRequest $ "https://api.github.com/repos/" <> name
-    resp <- httpJSON
-      $ addRequestHeader hAuthorization ("Bearer " <> encodeUtf8 token.token)
-      $ addRequestHeader hUserAgent "github-app-token/example"
-      $ req
-
-    pure $ getResponseBody resp
+    getRepo token name
 
   cancelRefresh ref
   pure repos
@@ -125,7 +134,17 @@ main = do
   Hspec.hspec $ do
     Hspec.describe "Basic usage" $ do
       Hspec.it "works" $ do
-        getRepo "freckle/github-app-token"
+        token <- getAppToken
+        getRepo token "freckle/github-app-token"
+          `Hspec.shouldReturn` Repo
+            { name = "github-app-token"
+            , description = "Generate an installation token for a GitHub App"
+            }
+
+    Hspec.describe "By owner" $ do
+      Hspec.it "works" $ do
+        token <- getOwnerAppToken
+        getRepo token "freckle/github-app-token"
           `Hspec.shouldReturn` Repo
             { name = "github-app-token"
             , description = "Generate an installation token for a GitHub App"
