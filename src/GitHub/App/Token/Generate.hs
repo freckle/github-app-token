@@ -94,9 +94,11 @@ generateOwnerToken = generateOwnerTokenScoped mempty
 -- | <https://docs.github.com/en/rest/apps/apps?apiVersion=2022-11-28#create-an-installation-access-token-for-an-app>
 data CreateAccessToken = CreateAccessToken
   { repositories :: [Text]
-  -- ^ List of @{owner}/{name}@ values
+  -- ^ List of repository names that the token should have access to
   , repository_ids :: [Int]
+  -- ^ List of repository IDs that the token should have access to
   , permissions :: Permissions
+  -- ^ The permissions granted to the user access token
   }
   deriving stock (Eq, Generic)
   deriving anyclass (ToJSON)
