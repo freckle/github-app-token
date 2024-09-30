@@ -85,7 +85,7 @@ getScopedAppToken = do
   let
     creds = AppCredentials {appId, privateKey}
     create = mempty
-      { repositories = ["freckle/github-app-token"]
+      { repositories = ["github-app-token"]
       , permissions = contents Read
       }
 
@@ -135,6 +135,15 @@ main = do
     Hspec.describe "Basic usage" $ do
       Hspec.it "works" $ do
         token <- getAppToken
+        getRepo token "freckle/github-app-token"
+          `Hspec.shouldReturn` Repo
+            { name = "github-app-token"
+            , description = "Generate an installation token for a GitHub App"
+            }
+
+    Hspec.describe "Scoped usage" $ do
+      Hspec.it "works" $ do
+        token <- getScopedAppToken
         getRepo token "freckle/github-app-token"
           `Hspec.shouldReturn` Repo
             { name = "github-app-token"
