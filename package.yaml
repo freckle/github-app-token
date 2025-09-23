@@ -90,5 +90,6 @@ tests:
       - http-conduit
       - http-types
       - hspec
-      - markdown-unlit
       - text
+    build-tools:
+      - markdown-unlit

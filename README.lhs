@@ -21,7 +21,6 @@ import Data.Traversable (for)
 import GitHub.App.Token.Refresh
 import System.Directory (doesFileExist)
 import Test.Hspec qualified as Hspec
-import Text.Markdown.Unlit ()
 ```
 -->
 
